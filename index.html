@@ -98,6 +98,24 @@
             color: white;
             pointer-events: auto;
             z-index: 1000;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #ff0055;
+            text-shadow: 0 0 20px #ff0055;
+            text-align: center;
+        }
+
+        button {
+            background: #ff0055;
+            color: white;
+            border: none;
             padding: 15px 40px;
             font-size: 24px;
             cursor: pointer;
@@ -192,6 +210,23 @@
         <div class="hud-top">
             <div id="hud-time">TIME: 03:00</div>
             <div id="hud-kills">KILLS: 0</div>
+        </div>
+        <div id="player-hp-bar">
+            <div id="player-hp-fill"></div>
+        </div>
+    </div>
+
+    <!-- Title Screen -->
+    <div id="title-screen" class="screen">
+        <h1>SEIFUKU vs ZOMBIE</h1>
+        <p>Survive for 3 minutes!</p>
+        <button id="start-btn">START GAME</button>
+    </div>
+
+    <!-- Level Up Screen -->
+    <div id="levelup-screen" class="screen hidden">
+        <h2 style="color: #00ffcc; text-shadow: 0 0 20px #00ffcc;">LEVEL UP!</h2>
+        <div id="upgrade-container">
             <!-- Upgrades injected here -->
         </div>
     </div>
@@ -202,11 +237,6 @@
         <h2 id="final-score">Kills: 0</h2>
         <button id="restart-btn">TRY AGAIN</button>
     </div>
-
-    <!-- Mobile Joystick (Hidden, touch anywhere) -->
-    <!-- <div id="joystick-zone">
-        <div id="joystick-knob"></div>
-    </div> -->
 
     <script type="module" src="js/main.js"></script>
 </body>
