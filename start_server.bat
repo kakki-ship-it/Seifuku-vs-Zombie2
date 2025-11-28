@@ -1,0 +1,6 @@
+@echo off
+echo Starting Local Game Server...
+echo Opening browser...
+start http://localhost:8000
+python -m http.server 8000
+pause
