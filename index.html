@@ -89,103 +89,90 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            pointer-events: auto;
-        }
 
-        .hidden {
-            display: none !important;
-        }
+            h1 {
+                font-size: 48px;
+                margin-bottom: 20px;
+                color: #ff0055;
+                text-shadow: 0 0 20px #ff0055;
+            }
 
-        h1 {
-            font-size: 48px;
-            margin-bottom: 20px;
-            color: #ff0055;
-            text-shadow: 0 0 20px #ff0055;
-        }
+            button {
+                background: #ff0055;
+                color: white;
+                border: none;
+                padding: 15px 40px;
+                font-size: 24px;
+                cursor: pointer;
+                border-radius: 5px;
+                margin: 10px;
+                transition: transform 0.1s;
+            }
 
-        button {
-            background: #ff0055;
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 24px;
-            cursor: pointer;
-            border-radius: 5px;
-            margin: 10px;
-            transition: transform 0.1s;
-        }
+            button:active {
+                transform: scale(0.95);
+            }
 
-        button:active {
-            transform: scale(0.95);
-        }
+            /* Mobile Controls */
+            #joystick-zone {
+                position: absolute;
+                bottom: 50px;
+                left: 50px;
+                width: 150px;
+                height: 150px;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 50%;
+                display: none;
+                pointer-events: auto;
+            }
 
-        /* Mobile Controls */
-        #joystick-zone {
-            position: absolute;
-            bottom: 50px;
-            left: 50px;
-            width: 150px;
-            height: 150px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            display: none;
-            pointer-events: auto;
-        }
+            #joystick-knob {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 50px;
+                height: 50px;
+                background: rgba(255, 255, 255, 0.5);
+                border-radius: 50%;
+                transform: translate(-50%, -50%);
+                pointer-events: none;
+            }
 
-        #joystick-knob {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 50px;
-            height: 50px;
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-        }
+            /* Upgrade Cards */
+            #upgrade-container {
+                display: flex;
+                gap: 20px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
 
-        /* Upgrade Cards */
-        #upgrade-container {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
+            .upgrade-card {
+                background: #222;
+                border: 2px solid #444;
+                padding: 20px;
+                width: 200px;
+                cursor: pointer;
+                transition: all 0.2s;
+                text-align: center;
+            }
 
-        .upgrade-card {
-            background: #222;
-            border: 2px solid #444;
-            padding: 20px;
-            width: 200px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: center;
-        }
+            .upgrade-card:hover {
+                border-color: #00ffcc;
+                transform: translateY(-5px);
+                background: #333;
+            }
 
-        .upgrade-card:hover {
-            border-color: #00ffcc;
-            transform: translateY(-5px);
-            background: #333;
-        }
+            .upgrade-title {
+                color: #00ffcc;
+                font-size: 18px;
+                margin-bottom: 10px;
+                font-weight: bold;
+            }
 
-        .upgrade-title {
-            color: #00ffcc;
-            font-size: 18px;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        .upgrade-desc {
-            font-size: 14px;
-            color: #ccc;
-        }
+            .upgrade-desc {
+                font-size: 14px;
+                color: #ccc;
+            }
     </style>
     <!-- Import Map for Three.js -->
     <script type="importmap">

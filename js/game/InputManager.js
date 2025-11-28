@@ -42,6 +42,7 @@ export class InputManager {
             }, { passive: false });
 
             touchZone.addEventListener('touchend', (e) => {
+                if (e.target.tagName === 'BUTTON' || e.target.closest('.upgrade-card')) return;
                 e.preventDefault();
                 InputManager.joystickActive = false;
                 InputManager.moveVector.set(0, 0);
