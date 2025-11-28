@@ -224,6 +224,10 @@ export class GameManager {
             card.className = 'upgrade-card';
             card.innerHTML = `<div class="upgrade-title">${opt.name}</div><div class="upgrade-desc">${opt.desc}</div>`;
             card.onclick = () => GameManager.selectUpgrade(opt.id);
+            card.addEventListener('touchstart', (e) => {
+                e.preventDefault(); // Prevent double fire if click also fires
+                GameManager.selectUpgrade(opt.id);
+            }, { passive: false });
             container.appendChild(card);
         });
     }
