@@ -10,13 +10,14 @@ export class AssetManager {
         const loadTexture = (name, path) => {
             return new Promise((resolve) => {
                 loader.load(path, (tex) => {
+                    console.log(`Loaded texture: ${name}`);
                     tex.magFilter = THREE.NearestFilter; // Pixel art look
                     tex.minFilter = THREE.NearestFilter;
                     tex.colorSpace = THREE.SRGBColorSpace;
                     AssetManager.textures[name] = tex;
                     resolve();
                 }, undefined, (err) => {
-                    console.warn(`Failed to load ${path}, using placeholder.`);
+                    console.warn(`Failed to load ${path}, using placeholder. Error:`, err);
                     AssetManager.textures[name] = AssetManager.createPlaceholder(name);
                     resolve();
                 });
@@ -24,7 +25,9 @@ export class AssetManager {
         };
 
         // Load Player (Generated)
-        await loadTexture('player', 'assets/textures/player.png');
+        await loadTexture('player', './assets/textures/player.png');
+        await loadTexture('floor_real', './assets/textures/floor_real.jpg');
+        await loadTexture('wall_real', './assets/textures/wall_real.jpg');
 
         // Generate Placeholders for others (Quota limit)
         AssetManager.textures['zombie'] = AssetManager.createPlaceholder('zombie', '#00ff00'); // Green

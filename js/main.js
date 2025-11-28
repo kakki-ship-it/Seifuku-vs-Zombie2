@@ -54,10 +54,11 @@ async function init() {
 
     // 3. Event Listeners
     window.addEventListener('resize', onWindowResize, false);
-    
+
     // Mobile Joystick Check
-    if (Game.isMobile) {
-        document.getElementById('joystick-zone').style.display = 'block';
+    const joystickZone = document.getElementById('joystick-zone');
+    if (Game.isMobile && joystickZone) {
+        joystickZone.style.display = 'block';
     }
 
     // 4. Start Loop

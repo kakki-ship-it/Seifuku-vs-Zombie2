@@ -19,40 +19,36 @@ export class InputManager {
         });
 
         // Touch / Joystick
-        const zone = document.getElementById('joystick-zone');
-        const knob = document.getElementById('joystick-knob');
-
+        // Touch Anywhere Logic
         if (window.Game.isMobile) {
-            zone.addEventListener('touchstart', (e) => {
+            const touchZone = document.body; // Listen on entire body
+
+            touchZone.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 const touch = e.changedTouches[0];
                 InputManager.joystickActive = true;
 
-                // Center of the zone
-                const rect = zone.getBoundingClientRect();
-                InputManager.joystickOrigin.set(rect.left + rect.width / 2, rect.top + rect.height / 2);
-
+                // Set origin to current touch
+                InputManager.joystickOrigin.set(touch.clientX, touch.clientY);
                 InputManager.updateJoystick(touch.clientX, touch.clientY);
             }, { passive: false });
 
-            zone.addEventListener('touchmove', (e) => {
+            touchZone.addEventListener('touchmove', (e) => {
                 e.preventDefault();
                 if (!InputManager.joystickActive) return;
                 const touch = e.changedTouches[0];
                 InputManager.updateJoystick(touch.clientX, touch.clientY);
             }, { passive: false });
 
-            zone.addEventListener('touchend', (e) => {
+            touchZone.addEventListener('touchend', (e) => {
                 e.preventDefault();
                 InputManager.joystickActive = false;
                 InputManager.moveVector.set(0, 0);
-                knob.style.transform = `translate(-50%, -50%)`;
             });
         }
     }
 
     static updateJoystick(x, y) {
-        const knob = document.getElementById('joystick-knob');
         const maxDist = 50; // Radius of zone
 
         let dx = x - InputManager.joystickOrigin.x;
@@ -64,9 +60,6 @@ export class InputManager {
             dx *= ratio;
             dy *= ratio;
         }
-
-        // Update Knob Visual
-        knob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
 
         // Update Vector (-1 to 1)
         InputManager.moveVector.set(dx / maxDist, -dy / maxDist); // Invert Y for 2D screen to 3D world mapping usually

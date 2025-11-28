@@ -16,7 +16,7 @@ export class EnemyManager {
         }
     }
 
-    static update(dt, playerPos) {
+    static update(dt, playerPos, obstacles) {
         // Spawning
         EnemyManager.spawnTimer += dt;
         if (EnemyManager.spawnTimer > EnemyManager.spawnInterval) {
@@ -32,7 +32,7 @@ export class EnemyManager {
         // Update Enemies
         for (const enemy of EnemyManager.enemies) {
             if (enemy.active) {
-                enemy.update(dt, playerPos);
+                enemy.update(dt, playerPos, obstacles);
             }
         }
     }
@@ -51,12 +51,21 @@ export class EnemyManager {
         );
 
         // Difficulty Color
-        let color = 0x00ff00; // Green
+        let color = 0x55aa55; // Green
         let hpMult = 1;
-        if (EnemyManager.spawnInterval < 0.8) { color = 0xffff00; hpMult = 2; } // Yellow
-        if (EnemyManager.spawnInterval < 0.5) { color = 0xff0000; hpMult = 4; } // Red
+        if (EnemyManager.spawnInterval < 0.8) { color = 0xaaaa55; hpMult = 2; } // Yellow-ish
+        if (EnemyManager.spawnInterval < 0.5) { color = 0xaa5555; hpMult = 4; } // Red-ish
 
-        enemy.mesh.material.color.setHex(color);
+        // Apply color to skin parts (Head, Arms)
+        enemy.mesh.children.forEach(child => {
+            // Simple heuristic: if material is the skin material (we can't easily check instance, but we can check initial color or just set all for now)
+            // Let's just tint everything for simplicity or try to target skin.
+            // Actually, setting everything is clearer for difficulty.
+            if (child.material) {
+                child.material.color.setHex(color);
+            }
+        });
+
         enemy.spawn(spawnPos, hpMult);
     }
 }

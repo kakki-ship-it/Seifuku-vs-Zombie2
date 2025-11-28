@@ -1,20 +1,17 @@
 import * as THREE from 'three';
-import { EnemyManager } from './EnemyManager.js';
-import { GameManager } from './GameManager.js';
-import { XPManager } from './XPManager.js';
-import { SoundManager } from './SoundManager.js';
 
 export class Projectile {
-    constructor(scene) {
+    constructor(scene, position, direction, damage) {
         this.scene = scene;
         this.mesh = null;
         this.speed = 20;
-        this.damage = 5;
+        this.damage = damage;
         this.active = false;
         this.lifeTime = 0;
         this.direction = new THREE.Vector3();
 
         this.init();
+        this.fire(position, direction);
     }
 
     init() {
@@ -34,7 +31,7 @@ export class Projectile {
     }
 
     update(dt) {
-        if (!this.active) return;
+        if (!this.active) return false;
 
         // Move
         this.mesh.position.add(this.direction.clone().multiplyScalar(this.speed * dt));
@@ -43,27 +40,10 @@ export class Projectile {
         this.lifeTime -= dt;
         if (this.lifeTime <= 0) {
             this.deactivate();
-            return;
+            return false;
         }
 
-        // Collision with Enemies
-        // Simple radius check
-        for (const enemy of EnemyManager.enemies) {
-            if (enemy.active) {
-                const distSq = this.mesh.position.distanceToSquared(enemy.mesh.position);
-                if (distSq < 1.0) { // Hit radius
-                    const killed = enemy.takeDamage(this.damage);
-                    SoundManager.playHit();
-                    if (killed) {
-                        GameManager.kills++;
-                        XPManager.spawn(enemy.mesh.position, 1);
-                        GameManager.shake(0.1, 0.5);
-                    }
-                    this.deactivate();
-                    break; // One hit per bullet for now (unless piercing)
-                }
-            }
-        }
+        return true;
     }
 
     deactivate() {

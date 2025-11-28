@@ -3,6 +3,7 @@ import { Player } from './Player.js';
 import { AssetManager } from './AssetManager.js';
 import { EnemyManager } from './EnemyManager.js';
 import { ProjectileManager } from './ProjectileManager.js';
+import { EffectManager } from './EffectManager.js';
 import { XPManager } from './XPManager.js';
 import { UpgradeManager } from './UpgradeManager.js';
 import { SoundManager } from './SoundManager.js';
@@ -19,6 +20,10 @@ export class GameManager {
     static shakeDuration = 0;
     static shakeIntensity = 0;
 
+    // Map / Collision
+    static obstacles = []; // Array of Box3
+    static mapBounds = { minX: -48, maxX: 48, minZ: -48, maxZ: 48 }; // Slightly inside 50
+
     static init() {
         GameManager.scene = window.Game.scene;
 
@@ -29,6 +34,7 @@ export class GameManager {
         EnemyManager.init(GameManager.scene);
         ProjectileManager.init(GameManager.scene);
         XPManager.init(GameManager.scene);
+        EffectManager.init(GameManager.scene);
 
         // Setup Player
         GameManager.player = new Player(GameManager.scene);
@@ -39,8 +45,10 @@ export class GameManager {
     }
 
     static createMap() {
+        GameManager.obstacles = [];
+
         // Floor
-        const floorTex = AssetManager.textures['floor'];
+        const floorTex = AssetManager.textures['floor_real'] || AssetManager.textures['floor'];
         floorTex.wrapS = THREE.RepeatWrapping;
         floorTex.wrapT = THREE.RepeatWrapping;
         floorTex.repeat.set(20, 20);
@@ -51,6 +59,63 @@ export class GameManager {
         floor.rotation.x = -Math.PI / 2;
         floor.receiveShadow = true;
         GameManager.scene.add(floor);
+
+        // Walls (Perimeter)
+        const wallTex = AssetManager.textures['wall_real'] || AssetManager.textures['wall'];
+        wallTex.wrapS = THREE.RepeatWrapping;
+        wallTex.wrapT = THREE.RepeatWrapping;
+        wallTex.repeat.set(20, 1); // Repeat horizontally
+
+        const wallHeight = 4;
+        const wallGeo = new THREE.BoxGeometry(100, wallHeight, 1);
+        const wallMat = new THREE.MeshStandardMaterial({ map: wallTex });
+
+        // Helper to add wall collision
+        const addWall = (mesh) => {
+            GameManager.scene.add(mesh);
+            // We don't strictly need Box3 for perimeter if we use simple bounds check,
+            // but for consistency let's rely on mapBounds for perimeter and obstacles for internal.
+        };
+
+        const wall1 = new THREE.Mesh(wallGeo, wallMat);
+        wall1.position.set(0, wallHeight / 2, -50);
+        addWall(wall1);
+
+        const wall2 = new THREE.Mesh(wallGeo, wallMat);
+        wall2.position.set(0, wallHeight / 2, 50);
+        addWall(wall2);
+
+        const wall3 = new THREE.Mesh(wallGeo, wallMat);
+        wall3.rotation.y = Math.PI / 2;
+        wall3.position.set(-50, wallHeight / 2, 0);
+        addWall(wall3);
+
+        const wall4 = new THREE.Mesh(wallGeo, wallMat);
+        wall4.rotation.y = Math.PI / 2;
+        wall4.position.set(50, wallHeight / 2, 0);
+        addWall(wall4);
+
+        // Random Pillars
+        const pillarGeo = new THREE.BoxGeometry(2, 4, 2);
+        const pillarMat = new THREE.MeshStandardMaterial({ map: wallTex }); // Use wall texture for now
+
+        for (let i = 0; i < 10; i++) {
+            const x = (Math.random() - 0.5) * 80;
+            const z = (Math.random() - 0.5) * 80;
+
+            // Avoid center (spawn)
+            if (Math.abs(x) < 5 && Math.abs(z) < 5) continue;
+
+            const pillar = new THREE.Mesh(pillarGeo, pillarMat);
+            pillar.position.set(x, 2, z);
+            pillar.castShadow = true;
+            pillar.receiveShadow = true;
+            GameManager.scene.add(pillar);
+
+            // Add collision box
+            const box = new THREE.Box3().setFromObject(pillar);
+            GameManager.obstacles.push(box);
+        }
     }
 
     static startGame() {
@@ -80,10 +145,15 @@ export class GameManager {
 
         // Updates
         if (GameManager.player) {
-            GameManager.player.update(dt);
-            EnemyManager.update(dt, GameManager.player.mesh.position);
-            ProjectileManager.update(dt);
+            GameManager.player.update(dt, GameManager.obstacles, GameManager.mapBounds);
+            EnemyManager.update(dt, GameManager.player.mesh.position, GameManager.obstacles);
+            ProjectileManager.update(dt, GameManager.obstacles, (enemyPos) => {
+                GameManager.kills++;
+                XPManager.spawn(enemyPos, 1);
+                // GameManager.shake(0.1, 0.5); // Disabled by user request
+            });
             XPManager.update(dt, GameManager.player.mesh.position);
+            EffectManager.update(dt);
 
             // Player-Enemy Collision
             for (const enemy of EnemyManager.enemies) {

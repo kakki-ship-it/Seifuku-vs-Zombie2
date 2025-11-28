@@ -22,7 +22,7 @@ export class UpgradeManager {
                 player.speed *= 1.2;
                 break;
             case 'rate':
-                player.projectileCount = (player.projectileCount || 1) + 1;
+                player.projectileCount = (player.projectileCount || 1) + 2;
                 player.fireRateMod = (player.fireRateMod || 1.0) * 0.8; // Faster
                 break;
             case 'damage':
