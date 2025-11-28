@@ -24,6 +24,7 @@ export class InputManager {
             const touchZone = document.body; // Listen on entire body
 
             touchZone.addEventListener('touchstart', (e) => {
+                if (e.target.tagName === 'BUTTON') return; // Allow button clicks
                 e.preventDefault();
                 const touch = e.changedTouches[0];
                 InputManager.joystickActive = true;

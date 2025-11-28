@@ -40,8 +40,18 @@ export class GameManager {
         GameManager.player = new Player(GameManager.scene);
 
         // UI Listeners
-        document.getElementById('start-btn').addEventListener('click', GameManager.startGame);
+        const startBtn = document.getElementById('start-btn');
+        startBtn.addEventListener('click', GameManager.startGame);
+        startBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Prevent double fire
+            GameManager.startGame();
+        }, { passive: false });
+
         document.getElementById('restart-btn').addEventListener('click', GameManager.restartGame);
+        document.getElementById('restart-btn').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            GameManager.restartGame();
+        }, { passive: false });
     }
 
     static createMap() {
@@ -120,6 +130,9 @@ export class GameManager {
 
     static startGame() {
         SoundManager.init();
+        if (SoundManager.ctx && SoundManager.ctx.state === 'suspended') {
+            SoundManager.ctx.resume();
+        }
         document.getElementById('title-screen').classList.add('hidden');
         document.getElementById('ui-layer').style.pointerEvents = 'none'; // Allow click through
         GameManager.isPlaying = true;
