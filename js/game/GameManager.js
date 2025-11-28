@@ -225,7 +225,6 @@ export class GameManager {
             card.innerHTML = `<div class="upgrade-title">${opt.name}</div><div class="upgrade-desc">${opt.desc}</div>`;
             card.onclick = () => GameManager.selectUpgrade(opt.id);
             card.addEventListener('touchstart', (e) => {
-                console.log('Card touchstart fired for:', opt.name);
                 e.preventDefault(); // Prevent double fire if click also fires
                 GameManager.selectUpgrade(opt.id);
             }, { passive: false });
