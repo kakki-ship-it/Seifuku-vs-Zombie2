@@ -9,7 +9,17 @@ export class AssetManager {
         // Helper to load texture with promise
         const loadTexture = (name, path) => {
             return new Promise((resolve) => {
+                let timedOut = false;
+                const timer = setTimeout(() => {
+                    timedOut = true;
+                    console.warn(`Timeout loading ${path}, using placeholder.`);
+                    AssetManager.textures[name] = AssetManager.createPlaceholder(name);
+                    resolve();
+                }, 2000); // 2 second timeout
+
                 loader.load(path, (tex) => {
+                    if (timedOut) return;
+                    clearTimeout(timer);
                     console.log(`Loaded texture: ${name}`);
                     tex.magFilter = THREE.NearestFilter; // Pixel art look
                     tex.minFilter = THREE.NearestFilter;
@@ -17,6 +27,8 @@ export class AssetManager {
                     AssetManager.textures[name] = tex;
                     resolve();
                 }, undefined, (err) => {
+                    if (timedOut) return;
+                    clearTimeout(timer);
                     console.warn(`Failed to load ${path}, using placeholder. Error:`, err);
                     AssetManager.textures[name] = AssetManager.createPlaceholder(name);
                     resolve();

@@ -67,13 +67,42 @@ export class Enemy {
         this.maxHp = this.hp;
     }
 
-    update(dt, playerPos, obstacles) {
+    update(dt, playerPos, obstacles, otherEnemies) {
         if (!this.active) return;
 
         // Chase Player
-        const dir = new THREE.Vector3().subVectors(playerPos, this.mesh.position).normalize();
+        const dir = new THREE.Vector3().subVectors(playerPos, this.mesh.position);
+        dir.y = 0; // Ignore height difference
+        dir.normalize();
+
+        // Separation (Avoid overlapping with other enemies)
+        const separation = new THREE.Vector3();
+        if (otherEnemies) {
+            const separationRadius = 0.8; // Minimum distance between zombies
+            let count = 0;
+            for (const other of otherEnemies) {
+                if (other === this || !other.active) continue;
+                const distSq = this.mesh.position.distanceToSquared(other.mesh.position);
+                if (distSq < separationRadius * separationRadius) {
+                    const pushDir = new THREE.Vector3().subVectors(this.mesh.position, other.mesh.position);
+                    pushDir.y = 0; // Ignore Y in separation too
+                    pushDir.normalize();
+                    // Weight by distance (closer = stronger push)
+                    const dist = Math.sqrt(distSq);
+                    const force = (separationRadius - dist) / separationRadius;
+                    separation.add(pushDir.multiplyScalar(force));
+                    count++;
+                }
+            }
+            if (count > 0) {
+                separation.divideScalar(count).normalize().multiplyScalar(1.5); // Separation strength
+                dir.add(separation).normalize();
+            }
+        }
+
         const moveDist = this.speed * dt;
         const nextPos = this.mesh.position.clone().add(dir.clone().multiplyScalar(moveDist));
+        nextPos.y = 1; // Force ground level
 
         // Collision with Obstacles
         const enemyBox = new THREE.Box3().setFromCenterAndSize(nextPos, new THREE.Vector3(1, 2, 1));
@@ -122,7 +151,7 @@ export class Enemy {
             }
         }
 
-        this.mesh.lookAt(playerPos);
+        this.mesh.lookAt(new THREE.Vector3(playerPos.x, this.mesh.position.y, playerPos.z));
     }
 
     takeDamage(amount) {

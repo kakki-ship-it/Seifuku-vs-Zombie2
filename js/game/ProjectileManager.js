@@ -38,20 +38,30 @@ export class ProjectileManager {
 
                 // 2. Enemy Collision
                 if (p.active) {
+                    let closestEnemy = null;
+                    let closestDistSq = Infinity;
+                    const hitRadiusSq = 1.0; // Radius squared
+
                     for (const enemy of EnemyManager.enemies) {
                         if (enemy.active) {
                             const distSq = p.mesh.position.distanceToSquared(enemy.mesh.position);
-                            if (distSq < 1.0) { // Hit radius
-                                const killed = enemy.takeDamage(p.damage);
-                                SoundManager.playHit();
-                                if (killed) {
-                                    if (onKill) onKill(enemy.mesh.position);
+                            if (distSq < hitRadiusSq) {
+                                if (distSq < closestDistSq) {
+                                    closestDistSq = distSq;
+                                    closestEnemy = enemy;
                                 }
-                                p.active = false;
-                                p.mesh.visible = false;
-                                break;
                             }
                         }
+                    }
+
+                    if (closestEnemy) {
+                        const killed = closestEnemy.takeDamage(p.damage);
+                        SoundManager.playHit();
+                        if (killed) {
+                            if (onKill) onKill(closestEnemy.mesh.position);
+                        }
+                        p.active = false;
+                        p.mesh.visible = false;
                     }
                 }
 

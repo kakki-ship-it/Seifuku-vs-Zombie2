@@ -129,17 +129,24 @@ export class GameManager {
     }
 
     static startGame() {
-        SoundManager.init();
-        if (SoundManager.ctx && SoundManager.ctx.state === 'suspended') {
-            SoundManager.ctx.resume();
+        try {
+            SoundManager.init();
+            if (SoundManager.ctx && SoundManager.ctx.state === 'suspended') {
+                SoundManager.ctx.resume().catch(e => console.warn("Audio resume failed", e));
+            }
+            document.getElementById('title-screen').classList.add('hidden');
+            document.getElementById('ui-layer').style.pointerEvents = 'none'; // Allow click through
+            GameManager.isPlaying = true;
+            GameManager.isPaused = false;
+            GameManager.timeRemaining = 180;
+            GameManager.kills = 0;
+            GameManager.updateHUD();
+        } catch (e) {
+            console.error("Error starting game:", e);
+            // Force start if possible
+            document.getElementById('title-screen').classList.add('hidden');
+            GameManager.isPlaying = true;
         }
-        document.getElementById('title-screen').classList.add('hidden');
-        document.getElementById('ui-layer').style.pointerEvents = 'none'; // Allow click through
-        GameManager.isPlaying = true;
-        GameManager.isPaused = false;
-        GameManager.timeRemaining = 180;
-        GameManager.kills = 0;
-        GameManager.updateHUD();
     }
 
     static restartGame() {

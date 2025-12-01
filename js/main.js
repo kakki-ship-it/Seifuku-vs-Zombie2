@@ -48,7 +48,12 @@ async function init() {
     Game.scene.add(dirLight);
 
     // 2. Initialize Managers
-    await AssetManager.loadAll(); // Load textures
+    try {
+        await AssetManager.loadAll(); // Load textures
+    } catch (e) {
+        console.error("Asset loading error:", e);
+    }
+
     InputManager.init();
     GameManager.init();
 

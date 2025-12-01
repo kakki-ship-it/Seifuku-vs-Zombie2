@@ -32,7 +32,7 @@ export class EnemyManager {
         // Update Enemies
         for (const enemy of EnemyManager.enemies) {
             if (enemy.active) {
-                enemy.update(dt, playerPos, obstacles);
+                enemy.update(dt, playerPos, obstacles, EnemyManager.enemies);
             }
         }
     }
